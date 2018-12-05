@@ -8,6 +8,10 @@ def main(args):
     budgets = np.random.uniform(9, 11, n)
     prices = [11, 11]
     # Use integer program to get the clearing prices
+    instructor_prefs = np.random.uniform(.1, 2, (n, 2))
+    print("Instructor Preferences: {}".format(instructor_prefs))
+    prices = np.repeat(prices, n, axis=0) * instructor_prefs
+    # Allocate again at new prices
 
     # for x in prices:
 
