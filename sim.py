@@ -11,33 +11,34 @@ def main():
     prices = [11, 11]
     # Use integer program to get the clearing prices
     allocation = np.zeros((n, 2))
-    cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0))
+    print("Clearing prices: {}".format(prices))
+    print("Utilities: {}".format(utilities))
+    print("Budgets: {}".format(budgets))
+    print("Allocation: {}".format(allocation))
+    cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
     # Find clearing prices
     while not np.all(cleared_bool):
         if not cleared_bool[0]:
             prices[0] -= .1
-            cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0))
+            cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
         if not cleared_bool[1]:
             prices[1] -= .1
-            cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0))
+            cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
 
     # Prices should now be clearing
-    allocation = allocate(utilities, caps, budgets, prices)
+    allocation = allocate(utilities, caps, budgets, prices, n)
 
     # instructor_prefs = np.random.uniform(.1, 2, (n, 2))
     # print("Instructor Preferences: {}".format(instructor_prefs))
     # prices = np.repeat(prices, n, axis=0) * instructor_prefs
     # Allocate again at new prices
-    print("Clearing prices: {}".format(prices))
-    print("Utilities: {}".format(utilities))
-    print("Budgets: {}".format(budgets))
-    print("Allocation: {}".format(allocation))
+
 
     # for x in prices:
-def clearing(allocation_sums):
+def clearing(allocation_sums, utilities, caps):
     clearing_arr = np.array([False, False])
     for i in range(2):
-        if allocation_sums[i] >= min(np.count_nonzeros(utilities[:][i]), caps[i]):
+        if allocation_sums[i] >= min(np.count_nonzero(utilities[:][i]), caps[i]):
             clearing_arr[i] = True
     return clearing_arr
 
@@ -52,12 +53,16 @@ def allocate(utilities, caps, budgets, prices, n):
     capacity_constraint = enrollment <= caps
     prices = np.repeat([prices], n, axis=0)
     print(prices.shape)
-    payments = cp.multiply(alloc, prices)
+    payments = cp.sum(cp.multiply(alloc, prices), axis=1)
     budget_constraint = payments <= budgets
-    total_util = utilities * alloc
+    total_util = cp.sum(cp.multiply(utilities, alloc))
     problem = cp.Problem(cp.Maximize(total_util), [capacity_constraint, budget_constraint])
-    solution = problem.solve()
-
+    print(problem)
+    problem.solve()
+    for var in problem.variables():
+        solution = var.value
+    # print(problem.unpack_results())
+    print("Solution: {}".format(solution))
     return solution
 
 if __name__ == "__main__":
