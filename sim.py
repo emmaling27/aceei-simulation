@@ -5,7 +5,7 @@ import cvxpy as cp
 
 def main():
     n = 4 # Number of students
-    caps = [4, 4]
+    caps = [3, 1]
     utilities = np.random.random_integers(0, 100, (n, 2))
     budgets = np.random.uniform(9, 11, n)
     prices = [11, 11]
@@ -15,6 +15,29 @@ def main():
     print("Utilities: {}".format(utilities))
     print("Budgets: {}".format(budgets))
     print("Allocation: {}".format(allocation))
+    # cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
+    # # Find clearing prices
+    # while not np.all(cleared_bool):
+    #     if not cleared_bool[0]:
+    #         prices[0] -= .1
+    #         cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
+    #     if not cleared_bool[1]:
+    #         prices[1] -= .1
+    #         cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
+    # Find initial clearing prices
+    prices = adjust_prices(utilities, caps, budgets, prices, n)
+    # Prices should now be clearing
+    allocation = allocate(utilities, caps, budgets, prices, n)
+    # Generate instructor preferences
+    instructor_prefs = np.random.uniform(.1, 2, (n, 2))
+    print("Instructor Preferences: {}".format(instructor_prefs))
+    prices = np.repeat([prices], n, axis=0) * instructor_prefs
+    prices = adjust_prices(utilities, caps, budgets, prices, n)
+    allocation = allocate(utilities, caps, budgets, prices, n)
+
+
+def adjust_prices(utilities, caps, budgets, prices, n):
+    """return the new prices"""
     cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
     # Find clearing prices
     while not np.all(cleared_bool):
@@ -24,15 +47,7 @@ def main():
         if not cleared_bool[1]:
             prices[1] -= .1
             cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
-
-    # Prices should now be clearing
-    allocation = allocate(utilities, caps, budgets, prices, n)
-
-    # instructor_prefs = np.random.uniform(.1, 2, (n, 2))
-    # print("Instructor Preferences: {}".format(instructor_prefs))
-    # prices = np.repeat(prices, n, axis=0) * instructor_prefs
-    # Allocate again at new prices
-
+    return prices
 
     # for x in prices:
 def clearing(allocation_sums, utilities, caps):
