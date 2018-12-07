@@ -5,7 +5,7 @@ import cvxpy as cp
 
 def main():
     n = 4 # Number of students
-    caps = [2, 2]
+    caps = [4, 4]
     utilities = np.random.random_integers(0, 100, (n, 2))
     budgets = np.random.uniform(9, 11, n)
     prices = [11, 11]
@@ -37,33 +37,35 @@ def main():
     # for x in prices:
 def clearing(allocation_sums, utilities, caps):
     clearing_arr = np.array([False, False])
+    nonzeros = np.count_nonzero(utilities, axis=0)
     for i in range(2):
-        if allocation_sums[i] >= min(np.count_nonzero(utilities[:][i]), caps[i]):
+        if allocation_sums[i] >= min(nonzeros[i], caps[i]):
             clearing_arr[i] = True
+            print("cleared!")
     return clearing_arr
 
 
 def allocate(utilities, caps, budgets, prices, n):
     # Creates course allocation variable matrix with Boolean entries
     alloc = cp.Variable((n, 2), boolean=True)
-    print(alloc)
     enrollment = cp.sum(alloc, axis=0)
     # enrollment = cp.sum_entries(np.array(alloc), axis=0)
-    print(enrollment)
     capacity_constraint = enrollment <= caps
     prices = np.repeat([prices], n, axis=0)
-    print(prices.shape)
     payments = cp.sum(cp.multiply(alloc, prices), axis=1)
     budget_constraint = payments <= budgets
     total_util = cp.sum(cp.multiply(utilities, alloc))
     problem = cp.Problem(cp.Maximize(total_util), [capacity_constraint, budget_constraint])
-    print(problem)
+    # print(problem)
     problem.solve()
     for var in problem.variables():
         solution = var.value
     # print(problem.unpack_results())
-    print("Solution: {}".format(solution))
-    return solution
+    if solution is None:
+        solution = np.zeros((n,2))
+    print("Solution: {}".format(np.rint(solution)))
+    print("Prices: {}".format(prices))
+    return np.rint(solution)
 
 if __name__ == "__main__":
     # main(sys.argv)
