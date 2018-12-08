@@ -14,20 +14,34 @@ def main():
     print("Clearing prices: {}".format(prices))
     print("Utilities: {}".format(utilities))
     print("Budgets: {}".format(budgets))
-    # Find initial clearing prices
-    prices = adjust_prices(utilities, caps, budgets, prices, n)
-    # Prices should now be clearing
-    allocation = allocate(utilities, caps, budgets, prices, n)
+    run_course_match(n, caps, utilities, budgets, prices, None)
     # Generate instructor preferences
     instructor_prefs = np.array([[1, .1], [.1, 1], [2, 1], [1, 2]])
     # instructor_prefs = np.random.uniform(.1, 2, (n, 2))
     print("Instructor Preferences: {}".format(instructor_prefs))
-    prices = prices * instructor_prefs
-    prices = adjust_prices(utilities, caps, budgets, prices, n)
-    print("Final prices: {}".format(prices))
-    allocation = allocate(utilities, caps, budgets, prices, n)
-    print("Final allocation: {}".format(allocation))
+    run_course_match(n, caps, utilities, budgets, prices, instructor_prefs)
 
+
+def run_course_match(n, caps, utilities, budgets, prices, instructor_prefs=None):
+
+    # Find initial clearing prices
+    prices = adjust_prices(utilities, caps, budgets, prices, n)
+    # Prices should now be clearing
+    allocation = allocate(utilities, caps, budgets, prices, n)
+    print("Allocation w/o prefs: {}".format(allocation))
+    # Generate instructor preferences
+    if instructor_prefs is not None:
+        prices = prices * instructor_prefs
+        prices = adjust_prices(utilities, caps, budgets, prices, n)
+        print("Final prices: {}".format(prices))
+        allocation = allocate(utilities, caps, budgets, prices, n)
+        print("Instructor prefs allocation: {}".format(allocation))
+    return allocation
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/emma
 def adjust_prices(utilities, caps, budgets, prices, n):
     """return the new prices"""
     cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
@@ -43,13 +57,13 @@ def adjust_prices(utilities, caps, budgets, prices, n):
             cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
     return prices
 
+
 def clearing(allocation_sums, utilities, caps):
     clearing_arr = np.array([False, False])
     nonzeros = np.count_nonzero(utilities, axis=0)
     for i in range(2):
         if allocation_sums[i] >= min(nonzeros[i], caps[i]):
             clearing_arr[i] = True
-            print("cleared!")
     return clearing_arr
 
 
