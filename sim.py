@@ -5,8 +5,8 @@ import cvxpy as cp
 
 def main():
     n = 4 # Number of students
-    caps = [2, 3] # Capacities of two courses
-    utilities = np.array([[100, 70], [0, 100], [100, 90], [75, 100]])
+    caps = [2, 2] # Capacities of two courses
+    utilities = np.array([[100, 0], [0, 100], [100, 90], [75, 100]])
     # utilities = np.random.random_integers(0, 100, (n, 2))
     budgets = np.random.uniform(9, 11, n)
     prices = np.repeat([[11,11]], n, axis=0)
