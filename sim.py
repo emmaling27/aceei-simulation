@@ -28,9 +28,6 @@ def main():
     allocation = allocate(utilities, caps, budgets, prices, n)
     print("Final allocation: {}".format(allocation))
 
-def column(matrix, i):
-    return [row[i] for row in matrix]
-
 def adjust_prices(utilities, caps, budgets, prices, n):
     """return the new prices"""
     cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
