@@ -5,8 +5,8 @@ import cvxpy as cp
 
 def main():
     n = 4 # Number of students
-    caps = [2, 2] # Capacities of two courses
-    utilities = np.array([[100, 0], [0, 100], [100, 90], [75, 100]])
+    caps = [2, 3] # Capacities of two courses
+    utilities = np.array([[100, 70], [0, 100], [100, 90], [75, 100]])
     # utilities = np.random.random_integers(0, 100, (n, 2))
     budgets = np.random.uniform(9, 11, n)
     prices = np.repeat([[11,11]], n, axis=0)
@@ -21,11 +21,11 @@ def main():
     print("Instructor Preferences: {}".format(instructor_prefs))
     run_course_match(n, caps, utilities, budgets, prices, instructor_prefs)
 
-
 def run_course_match(n, caps, utilities, budgets, prices, instructor_prefs=None):
 
     # Find initial clearing prices
     prices = adjust_prices(utilities, caps, budgets, prices, n)
+    print("Prices w/o prefs: {}".format(prices))
     # Prices should now be clearing
     allocation = allocate(utilities, caps, budgets, prices, n)
     print("Allocation w/o prefs: {}".format(allocation))
@@ -33,15 +33,11 @@ def run_course_match(n, caps, utilities, budgets, prices, instructor_prefs=None)
     if instructor_prefs is not None:
         prices = prices * instructor_prefs
         prices = adjust_prices(utilities, caps, budgets, prices, n)
-        print("Final prices: {}".format(prices))
+        print("Instructor pref prices: {}".format(prices))
         allocation = allocate(utilities, caps, budgets, prices, n)
         print("Instructor prefs allocation: {}".format(allocation))
     return allocation
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/emma
 def adjust_prices(utilities, caps, budgets, prices, n):
     """return the new prices"""
     cleared_bool = clearing(np.sum(allocate(utilities, caps, budgets, prices, n), axis=0), utilities, caps)
