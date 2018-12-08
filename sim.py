@@ -5,8 +5,9 @@ import cvxpy as cp
 
 def main():
     n = 4 # Number of students
-    caps = [3, 1] # Capacities of two courses
-    utilities = np.random.random_integers(0, 100, (n, 2))
+    caps = [2, 2] # Capacities of two courses
+    utilities = np.array([[100, 0], [0, 100], [100, 90], [75, 100]])
+    # utilities = np.random.random_integers(0, 100, (n, 2))
     budgets = np.random.uniform(9, 11, n)
     prices = np.repeat([[11,11]], n, axis=0)
     allocation = np.zeros((n, 2))
@@ -18,7 +19,8 @@ def main():
     # Prices should now be clearing
     allocation = allocate(utilities, caps, budgets, prices, n)
     # Generate instructor preferences
-    instructor_prefs = np.random.uniform(.1, 2, (n, 2))
+    instructor_prefs = np.array([[1, .1], [.1, 1], [2, 1], [1, 2]])
+    # instructor_prefs = np.random.uniform(.1, 2, (n, 2))
     print("Instructor Preferences: {}".format(instructor_prefs))
     prices = prices * instructor_prefs
     prices = adjust_prices(utilities, caps, budgets, prices, n)
